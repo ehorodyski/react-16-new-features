@@ -2,28 +2,25 @@ import React, { useState, useEffect, useReducer } from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 
-const App = (props) => {
-
-  const [count, setCount] = useState(props.count);
-  const [label, setLabel] = useState(props.label);
+const Note = ({ note, removeNote }) => {
 
   return (
     <div>
-      <p>The current {label} is {count}</p>
-      <button onClick={() => setCount(count + 1)}>+1</button>
-      <button onClick={() => setCount(props.count)}>Reset</button>
-      <button onClick={() => setCount(count - 1)}>-1</button>
-      <input type="text" value={label} onChange={(e) => setLabel(e.target.value)} />
+      <h3>{note.title}</h3>
+      <p>{note.body}</p>
+      <button onClick={() => removeNote(note.title)}>Remove</button>
     </div>
   );
 };
-App.defaultProps = { count: 0, label: 'count' };
 
 const NoteApp = () => {
 
   const [notes, setNotes] = useState([]);
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
+
+  useEffect(() => { setNotes(JSON.parse(localStorage.getItem('notes')) || []); }, []);
+  useEffect(() => localStorage.setItem('notes', JSON.stringify(notes)), [notes]);
 
   const addNote = (e) => {
     e.preventDefault();
@@ -45,13 +42,7 @@ const NoteApp = () => {
         <textarea value={body} onChange={(e) => setBody(e.target.value)}></textarea>
         <button>Add Note</button>
       </form>
-      {notes.map((note, index) => (
-        <div key={index}>
-          <h3>{note.title}</h3>
-          <p>{note.body}</p>
-          <button onClick={() => removeNote(note.title)}>Remove</button>
-        </div>
-      ))}
+      {notes.map((note) => <Note key={note.title} note={note} removeNote={removeNote} />)}
     </div>
   );
 };
