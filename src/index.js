@@ -1,8 +1,23 @@
-import React from 'react';
+import React, { useState, useEffect, useReducer } from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
 import * as serviceWorker from './serviceWorker';
+
+const App = (props) => {
+
+  const [count, setCount] = useState(props.count);
+  const [label, setLabel] = useState(props.label);
+
+  return (
+    <div>
+      <p>The current {label} is {count}</p>
+      <button onClick={() => setCount(count + 1)}>+1</button>
+      <button onClick={() => setCount(props.count)}>Reset</button>
+      <button onClick={() => setCount(count - 1)}>-1</button>
+      <input type="text" value={label} onChange={(e) => setLabel(e.target.value)} />
+    </div>
+  );
+};
+App.defaultProps = { count: 0, label: 'count' };
 
 ReactDOM.render(<App />, document.getElementById('root'));
 
