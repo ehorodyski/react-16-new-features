@@ -2,6 +2,19 @@ import React, { useState, useEffect, useReducer } from 'react';
 import ReactDOM from 'react-dom';
 import * as serviceWorker from './serviceWorker';
 
+const reducer = (state, action) => {
+  switch (action.type) {
+    case 'SET_NOTES':
+      return action.notes;
+    case 'ADD_NOTE':
+      return [...state, { title: action.title, body: action.body }];
+    case 'REMOVE_NOTE':
+      return state.filter((note) => note.title !== action.title);
+    default:
+      return state;
+  }
+};
+
 const Note = ({ note, removeNote }) => {
 
   return (
@@ -15,22 +28,29 @@ const Note = ({ note, removeNote }) => {
 
 const NoteApp = () => {
 
-  const [notes, setNotes] = useState([]);
+  const [notes, dispatch] = useReducer(reducer, []);
+
   const [title, setTitle] = useState('');
   const [body, setBody] = useState('');
 
-  useEffect(() => { setNotes(JSON.parse(localStorage.getItem('notes')) || []); }, []);
+  useEffect(() => {
+    const notes = JSON.parse(localStorage.getItem('notes')) || [];
+    dispatch({ type: 'SET_NOTES', notes });
+  }, []);
+
   useEffect(() => localStorage.setItem('notes', JSON.stringify(notes)), [notes]);
 
   const addNote = (e) => {
     e.preventDefault();
-    setNotes([...notes, { title, body }]);
+
+    dispatch({ type: 'ADD_NOTE', title, body });
+
     setTitle('');
     setBody('');
   };
 
   const removeNote = (title) => {
-    setNotes(notes.filter((note) => note.title !== title));
+    dispatch({ type: 'REMOVE_NOTE', title });
   };
 
   return (
